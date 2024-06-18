@@ -12,18 +12,12 @@ public class NewsService {
     @Autowired
     private NewsRepository newsRepository;
 
-    // demo endpoint
-
-    public String demo() {
-        return "Hello from News Service!";
-    }
-
     public List<News> getAllNews() {
         return newsRepository.findAll();
     }
 
     public News getNewsById(Long id) {
-        return newsRepository.findById(id).orElse(null);
+        return newsRepository.findById(null).orElse(null);
     }
 
     public News saveNews(News news) {
@@ -31,6 +25,6 @@ public class NewsService {
     }
 
     public void deleteNews(Long id) {
-        newsRepository.deleteById(id);
+        newsRepository.deleteById(null);
     }
 }
