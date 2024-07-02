@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,9 @@ public class UserController {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     // get all users
     @GetMapping("")
     //   users and count of the users
@@ -43,6 +47,15 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user){
 
+        // check if user already exists
+        User existingUser = this.userRepo.findByUsername(user.getUsername());
+        if(existingUser != null){
+            return ResponseEntity.ok("User already exists");
+        }
+
+        // encrypt password
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
         User newUser = this.userRepo.save(user);
         return ResponseEntity.ok(newUser);
     }
@@ -56,7 +69,8 @@ public class UserController {
         if(user == null){
             return ResponseEntity.ok("User not found");
         }
-        if(user.getPassword().equals(password)){
+
+        if(bCryptPasswordEncoder.matches(password, user.getPassword())){
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.ok("Invalid password");
