@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,11 +39,21 @@ public class NewsController {
         
         return ResponseEntity.ok(response);
     }
+    // get news by id
+    @GetMapping("/{id}")
+     public ResponseEntity<?> getNewsById(@PathVariable String id) {
+        News news = newsRepo.findById(id).orElse(null);
+        if(news == null) {
+            return ResponseEntity.status(404).body("News not found");
+        } else {
+            return ResponseEntity.ok(news);
+        }
+    }
     // login
     @PostMapping("/create")
     public ResponseEntity<?> createNews(@RequestBody Map<String, String> news){
         // create a news
-        News newArticle = new News(news.get("title"), news.get("content"));
+        News newArticle = new News(news.get("title"), news.get("content"), news.get("authorId"), news.get("date"));
         News savedArticle = newsRepo.save(newArticle);
         return ResponseEntity.ok(savedArticle);
         
