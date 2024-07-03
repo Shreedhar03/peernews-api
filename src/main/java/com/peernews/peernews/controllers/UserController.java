@@ -67,12 +67,14 @@ public class UserController {
         String password = credentials.get("password");
         User user = userRepo.findByUsername(username);
         if(user == null){
-            return ResponseEntity.ok("User not found");
+            // set status code to 404 and return a message
+            return ResponseEntity.status(401).body("User not found");
+            
         }
 
         if(bCryptPasswordEncoder.matches(password, user.getPassword())){
-            return ResponseEntity.ok(user);
+            return ResponseEntity.status(200).body(user);
         }
-        return ResponseEntity.ok("Invalid password");
+        return ResponseEntity.status(401).body("Invalid credentials");
     }
 }
